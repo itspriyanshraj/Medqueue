@@ -1,0 +1,17 @@
+# Dependencies and generated build output
+**/node_modules/
+**/.next/
+**/out/
+**/build/
+
+# Local secrets and environment-specific settings
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local logs and debug output
+**/*.log
+npm-debug.log*
+
+# Deployment metadata
+**/.vercel/
