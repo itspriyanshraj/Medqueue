@@ -2,9 +2,10 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import User from "../models/user.model.js";
 
 const cookieName = "medqueue_session";
-const sessionSecret = process.env.SESSION_SECRET || process.env.MONGODB_URI;
+const sessionSecret = process.env.SESSION_SECRET;
 
 function sign(value) {
+  if (!sessionSecret) throw new Error("SESSION_SECRET is not configured.");
   return createHmac("sha256", sessionSecret).update(value).digest("base64url");
 }
 
@@ -35,13 +36,17 @@ export function setSessionCookie(res, userId) {
     exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
   })).toString("base64url");
   const token = `${payload}.${sign(payload)}`;
-  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  res.setHeader("Set-Cookie", `${cookieName}=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=2592000${secure}`);
+  const production = process.env.NODE_ENV === "production";
+  const secure = production ? "; Secure" : "";
+  const sameSite = production ? "None" : "Lax";
+  res.setHeader("Set-Cookie", `${cookieName}=${token}; HttpOnly; Path=/; SameSite=${sameSite}; Max-Age=2592000${secure}`);
 }
 
 export function clearSessionCookie(res) {
-  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  res.setHeader("Set-Cookie", `${cookieName}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0${secure}`);
+  const production = process.env.NODE_ENV === "production";
+  const secure = production ? "; Secure" : "";
+  const sameSite = production ? "None" : "Lax";
+  res.setHeader("Set-Cookie", `${cookieName}=; HttpOnly; Path=/; SameSite=${sameSite}; Max-Age=0${secure}`);
 }
 
 export async function requireAuth(req, res, next) {

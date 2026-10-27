@@ -15,3 +15,5 @@ npm-debug.log*
 
 # Deployment metadata
 **/.vercel/
+
+.vercel
