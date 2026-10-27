@@ -1,4 +1,4 @@
-const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL || "/api";
 export const API_URL = configuredApiUrl.replace(/\/+$/, "");
 
 // Send a request to the backend and return its JSON response.
@@ -15,7 +15,7 @@ export async function requestApi(path, options = {}) {
       },
     });
   } catch {
-    throw new Error("Could not connect to the MedQueue API. Start the backend and try again.");
+    throw new Error("Could not connect to the MedQueue API. Please try again shortly.");
   }
 
   const result = await response.json().catch(() => ({}));
